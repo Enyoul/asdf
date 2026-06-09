@@ -1,0 +1,51 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// 상태 플래그
+#define FLAG_POWER_ON   0x01  // bit0: 전원 ON
+#define FLAG_OVERLOAD   0x02  // bit1: 과부하 경고
+#define FLAG_SAVE_POWER 0x04  // bit2: 절전 권고
+#define FLAG_ERROR      0x08  // bit3: 측정 오류
+
+void analyzeDevice(Device* dev) {
+    dev->status = 0;
+
+    if (dev->voltage > 0 && dev->current > 0 && dev->runningHours > 0) {
+        dev->status |= FLAG_POWER_ON;
+    }
+
+    if (dev->power > dev->ratedPower * 1.1) {
+        dev->status |= FLAG_OVERLOAD;
+    }
+
+    if (dev->runningHours >= 8.0 || dev->energyKWh >= 1.0) {
+        dev->status |= FLAG_SAVE_POWER;
+    }
+
+    if (dev->power > dev->ratedPower * 2.0) {
+        dev->status |= FLAG_ERROR;
+    }
+}
+
+void printStatus(unsigned char status) {
+    if (status & FLAG_POWER_ON) {
+        printf("ON ");
+    }
+    else {
+        printf("OFF ");
+    }
+
+    if (status & FLAG_OVERLOAD) {
+        printf("| OVERLOAD ");
+    }
+
+    if (status & FLAG_SAVE_POWER) {
+        printf("| SAVE_POWER ");
+    }
+
+    if (status & FLAG_ERROR) {
+        printf("| ERROR ");
+    }
+}
